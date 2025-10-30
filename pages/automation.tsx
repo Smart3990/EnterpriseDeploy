@@ -1,91 +1,173 @@
 import { useState } from 'react'
 import Layout from '@/components/Layout'
 import { useTheme } from '@/contexts/ThemeContext'
-import { Workflow, Play, Pause, Settings, Plus, Zap, Calendar, Mail, MessageSquare, Database } from 'lucide-react'
+import { 
+  Workflow, 
+  Play, 
+  Pause, 
+  Settings, 
+  Plus, 
+  Zap, 
+  Download,
+  ExternalLink,
+  Database,
+  MessageSquare,
+  Bot,
+  FileText,
+  Mail,
+  TrendingUp,
+  Smartphone,
+  Code,
+  Globe,
+  Cloud
+} from 'lucide-react'
 
 export default function Automation() {
   const { theme } = useTheme()
-  const [activeTab, setActiveTab] = useState<'workflows' | 'templates'>('workflows')
+  const [activeTab, setActiveTab] = useState<'templates' | 'myWorkflows'>('templates')
+  const [selectedCategory, setSelectedCategory] = useState('all')
 
-  const workflows = [
+  const n8nWorkflowCategories = [
     {
-      id: 1,
-      name: 'Social Media Auto-Poster',
-      description: 'Automatically post generated content to social media platforms',
-      status: 'active',
-      lastRun: '2 hours ago',
-      icon: MessageSquare,
-      color: 'from-blue-500 to-cyan-500'
+      id: 'ai-rag',
+      name: 'AI & RAG Pipelines',
+      icon: Bot,
+      color: 'from-purple-500 to-indigo-600',
+      count: 45,
+      description: 'Vector DBs, embeddings, OpenAI GPT-4, Claude 3, LLM chains',
+      githubPath: 'https://github.com/wassupjay/n8n-free-templates/tree/main/AI'
     },
     {
-      id: 2,
-      name: 'Content Generation Pipeline',
-      description: 'Generate, review, and publish content automatically',
-      status: 'active',
-      lastRun: '5 hours ago',
+      id: 'data-etl',
+      name: 'Data & ETL',
+      icon: Database,
+      color: 'from-blue-500 to-cyan-600',
+      count: 30,
+      description: 'PostgreSQL, MongoDB, Redis, data transformations',
+      githubPath: 'https://github.com/wassupjay/n8n-free-templates/tree/main/Data'
+    },
+    {
+      id: 'automation',
+      name: 'Business Automation',
       icon: Zap,
+      color: 'from-yellow-500 to-orange-600',
+      count: 35,
+      description: 'Slack alerts, Google Sheets, workflow orchestration',
+      githubPath: 'https://github.com/wassupjay/n8n-free-templates/tree/main/Business'
+    },
+    {
+      id: 'communication',
+      name: 'Communication & Alerts',
+      icon: MessageSquare,
+      color: 'from-green-500 to-emerald-600',
+      count: 28,
+      description: 'Slack, Email, SMS, Discord, Telegram notifications',
+      githubPath: 'https://github.com/wassupjay/n8n-free-templates/tree/main/Communication'
+    },
+    {
+      id: 'content',
+      name: 'Content Generation',
+      icon: FileText,
+      color: 'from-pink-500 to-rose-600',
+      count: 22,
+      description: 'Document processing, OCR, AI writing, SEO automation',
+      githubPath: 'https://github.com/wassupjay/n8n-free-templates/tree/main/Content'
+    },
+    {
+      id: 'marketing',
+      name: 'Marketing & CRM',
+      icon: TrendingUp,
+      color: 'from-orange-500 to-red-600',
+      count: 20,
+      description: 'Lead scoring, email campaigns, analytics tracking',
+      githubPath: 'https://github.com/wassupjay/n8n-free-templates/tree/main/Marketing'
+    },
+    {
+      id: 'devops',
+      name: 'DevOps & Monitoring',
+      icon: Code,
+      color: 'from-indigo-500 to-purple-600',
+      count: 18,
+      description: 'CI/CD pipelines, error tracking, deployment automation',
+      githubPath: 'https://github.com/wassupjay/n8n-free-templates/tree/main/DevOps'
+    },
+    {
+      id: 'web-scraping',
+      name: 'Web Scraping',
+      icon: Globe,
+      color: 'from-teal-500 to-cyan-600',
+      count: 15,
+      description: 'Data extraction, price monitoring, content aggregation',
+      githubPath: 'https://github.com/wassupjay/n8n-free-templates/tree/main/Scraping'
+    },
+    {
+      id: 'iot',
+      name: 'IoT & APIs',
+      icon: Smartphone,
+      color: 'from-blue-600 to-indigo-600',
+      count: 12,
+      description: 'Sensor data, webhook integrations, API orchestration',
+      githubPath: 'https://github.com/wassupjay/n8n-free-templates/tree/main/IoT'
+    },
+    {
+      id: 'cloud',
+      name: 'Cloud Services',
+      icon: Cloud,
+      color: 'from-sky-500 to-blue-600',
+      count: 15,
+      description: 'AWS, Google Cloud, Azure integrations',
+      githubPath: 'https://github.com/wassupjay/n8n-free-templates/tree/main/Cloud'
+    }
+  ]
+
+  const myWorkflows = [
+    {
+      id: 1,
+      name: 'AI Content Generator',
+      description: 'Generate blog posts with GPT-4 and save to Notion',
+      status: 'active',
+      lastRun: '2 hours ago',
+      icon: Bot,
       color: 'from-purple-500 to-pink-500'
     },
     {
+      id: 2,
+      name: 'Lead Enrichment Pipeline',
+      description: 'Enrich leads from Airtable with Clearbit API',
+      status: 'active',
+      lastRun: '5 hours ago',
+      icon: TrendingUp,
+      color: 'from-blue-500 to-cyan-500'
+    },
+    {
       id: 3,
-      name: 'Database Sync',
-      description: 'Sync generated content across databases',
+      name: 'Error Alert System',
+      description: 'Monitor errors and send Slack notifications',
       status: 'paused',
       lastRun: 'Yesterday',
-      icon: Database,
-      color: 'from-green-500 to-emerald-500'
+      icon: MessageSquare,
+      color: 'from-orange-500 to-red-500'
     }
   ]
 
-  const templates = [
-    {
-      name: 'Email Automation',
-      description: 'Send automated emails based on triggers',
-      icon: Mail,
-      color: 'from-orange-500 to-red-500'
-    },
-    {
-      name: 'Scheduled Tasks',
-      description: 'Run tasks on a schedule',
-      icon: Calendar,
-      color: 'from-indigo-500 to-purple-500'
-    },
-    {
-      name: 'Webhook Integrations',
-      description: 'Connect external services via webhooks',
-      icon: Workflow,
-      color: 'from-pink-500 to-rose-500'
-    }
-  ]
+  const filteredCategories = selectedCategory === 'all'
+    ? n8nWorkflowCategories
+    : n8nWorkflowCategories.filter(cat => cat.id === selectedCategory)
 
   return (
     <Layout>
       <div className="max-w-7xl mx-auto px-6 py-12 space-y-10">
         <div>
           <h1 className={`text-4xl font-bold mb-3 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-            Automation Workflows
+            n8n Workflow Automation
           </h1>
           <p className={`text-lg ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-            Build and manage automated workflows with visual automation builder
+            200+ production-ready workflows from GitHub • Free to import and customize
           </p>
         </div>
 
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between flex-wrap gap-4">
           <div className="flex items-center space-x-2">
-            <button
-              onClick={() => setActiveTab('workflows')}
-              className={`px-6 py-3 rounded-lg font-medium transition-all ${
-                activeTab === 'workflows'
-                  ? theme === 'dark'
-                    ? 'bg-white/10 text-white'
-                    : 'bg-purple-100 text-purple-900'
-                  : theme === 'dark'
-                    ? 'text-gray-400 hover:text-white'
-                    : 'text-gray-600 hover:text-gray-900'
-              }`}
-            >
-              My Workflows
-            </button>
             <button
               onClick={() => setActiveTab('templates')}
               className={`px-6 py-3 rounded-lg font-medium transition-all ${
@@ -98,19 +180,179 @@ export default function Automation() {
                     : 'text-gray-600 hover:text-gray-900'
               }`}
             >
-              Templates
+              n8n Templates (200+)
+            </button>
+            <button
+              onClick={() => setActiveTab('myWorkflows')}
+              className={`px-6 py-3 rounded-lg font-medium transition-all ${
+                activeTab === 'myWorkflows'
+                  ? theme === 'dark'
+                    ? 'bg-white/10 text-white'
+                    : 'bg-purple-100 text-purple-900'
+                  : theme === 'dark'
+                    ? 'text-gray-400 hover:text-white'
+                    : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              My Workflows
             </button>
           </div>
 
-          <button className="bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 text-white px-6 py-3 rounded-xl font-medium hover:shadow-lg hover:shadow-pink-500/50 transition-all flex items-center space-x-2">
-            <Plus className="h-5 w-5" />
-            <span>Create Workflow</span>
-          </button>
+          <a
+            href="https://github.com/wassupjay/n8n-free-templates"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 text-white px-6 py-3 rounded-xl font-medium hover:shadow-lg hover:shadow-pink-500/50 transition-all flex items-center space-x-2"
+          >
+            <Download className="h-5 w-5" />
+            <span>Download from GitHub</span>
+            <ExternalLink className="h-4 w-4" />
+          </a>
         </div>
 
-        {activeTab === 'workflows' ? (
+        {activeTab === 'templates' ? (
+          <>
+            <div className={`rounded-2xl border p-8 ${
+              theme === 'dark'
+                ? 'bg-gradient-to-br from-purple-500/10 to-pink-500/10 border-purple-400/30'
+                : 'bg-gradient-to-br from-purple-50 to-pink-50 border-purple-200'
+            }`}>
+              <div className="flex items-start justify-between mb-6">
+                <div>
+                  <h3 className={`text-2xl font-bold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                    🚀 wassupjay/n8n-free-templates
+                  </h3>
+                  <p className={`text-lg ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                    200+ plug-and-play workflows with AI, Vector DBs, and LLM integrations
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid md:grid-cols-3 gap-6 mt-6">
+                <div className={`p-6 rounded-xl ${theme === 'dark' ? 'bg-white/5' : 'bg-white/80'}`}>
+                  <Zap className={`h-8 w-8 mb-3 ${theme === 'dark' ? 'text-yellow-400' : 'text-yellow-600'}`} />
+                  <h4 className={`font-bold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                    Production Ready
+                  </h4>
+                  <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                    Import JSON → Add credentials → Hit Activate ✅
+                  </p>
+                </div>
+                <div className={`p-6 rounded-xl ${theme === 'dark' ? 'bg-white/5' : 'bg-white/80'}`}>
+                  <Bot className={`h-8 w-8 mb-3 ${theme === 'dark' ? 'text-purple-400' : 'text-purple-600'}`} />
+                  <h4 className={`font-bold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                    AI Stack
+                  </h4>
+                  <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                    RAG, Pinecone, Weaviate, OpenAI GPT-4, Claude 3
+                  </p>
+                </div>
+                <div className={`p-6 rounded-xl ${theme === 'dark' ? 'bg-white/5' : 'bg-white/80'}`}>
+                  <MessageSquare className={`h-8 w-8 mb-3 ${theme === 'dark' ? 'text-green-400' : 'text-green-600'}`} />
+                  <h4 className={`font-bold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                    Built-in Alerts
+                  </h4>
+                  <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                    Slack notifications, Google Sheets logs, error handling
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <h2 className={`text-2xl font-bold mb-6 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                Browse by Category
+              </h2>
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredCategories.map((category) => {
+                  const Icon = category.icon
+                  return (
+                    <a
+                      key={category.id}
+                      href={category.githubPath}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`group rounded-2xl border p-8 hover:scale-[1.02] transition-all cursor-pointer ${
+                        theme === 'dark'
+                          ? 'bg-white/5 backdrop-blur-sm border-white/10 hover:bg-white/10'
+                          : 'bg-white border-gray-200 hover:shadow-xl'
+                      }`}
+                    >
+                      <div className={`bg-gradient-to-br ${category.color} p-4 rounded-xl w-fit mb-6 shadow-lg group-hover:shadow-xl transition-shadow`}>
+                        <Icon className="h-8 w-8 text-white" />
+                      </div>
+                      <div className="flex items-start justify-between mb-3">
+                        <h3 className={`text-xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                          {category.name}
+                        </h3>
+                        <span className={`px-3 py-1 rounded-full text-xs font-bold ${
+                          theme === 'dark'
+                            ? 'bg-white/10 text-purple-300'
+                            : 'bg-purple-100 text-purple-700'
+                        }`}>
+                          {category.count}+
+                        </span>
+                      </div>
+                      <p className={`text-sm mb-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                        {category.description}
+                      </p>
+                      <div className="flex items-center space-x-2 text-sm font-medium text-purple-500 group-hover:text-purple-600">
+                        <span>View on GitHub</span>
+                        <ExternalLink className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                      </div>
+                    </a>
+                  )
+                })}
+              </div>
+            </div>
+
+            <div className={`rounded-2xl border p-8 ${
+              theme === 'dark'
+                ? 'bg-white/5 backdrop-blur-sm border-white/10'
+                : 'bg-white border-gray-200'
+            }`}>
+              <h3 className={`text-xl font-bold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                🔧 Tech Stack Matrix
+              </h3>
+              <div className="grid md:grid-cols-2 gap-6">
+                <div>
+                  <h4 className={`font-semibold mb-3 ${theme === 'dark' ? 'text-purple-300' : 'text-purple-700'}`}>
+                    Vector Stores
+                  </h4>
+                  <div className="flex flex-wrap gap-2">
+                    {['Pinecone', 'Weaviate', 'Supabase Vector', 'Redis'].map(tech => (
+                      <span key={tech} className={`px-3 py-1 rounded-lg text-sm ${
+                        theme === 'dark'
+                          ? 'bg-white/5 text-gray-300'
+                          : 'bg-gray-100 text-gray-700'
+                      }`}>
+                        {tech}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <h4 className={`font-semibold mb-3 ${theme === 'dark' ? 'text-blue-300' : 'text-blue-700'}`}>
+                    LLM Providers
+                  </h4>
+                  <div className="flex flex-wrap gap-2">
+                    {['OpenAI GPT-4', 'Claude 3', 'Hugging Face', 'Cohere'].map(tech => (
+                      <span key={tech} className={`px-3 py-1 rounded-lg text-sm ${
+                        theme === 'dark'
+                          ? 'bg-white/5 text-gray-300'
+                          : 'bg-gray-100 text-gray-700'
+                      }`}>
+                        {tech}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </>
+        ) : (
           <div className="grid lg:grid-cols-2 gap-6">
-            {workflows.map((workflow) => {
+            {myWorkflows.map((workflow) => {
               const Icon = workflow.icon
               return (
                 <div
@@ -182,98 +424,23 @@ export default function Automation() {
                 </div>
               )
             })}
-          </div>
-        ) : (
-          <div className="grid md:grid-cols-3 gap-6">
-            {templates.map((template) => {
-              const Icon = template.icon
-              return (
-                <div
-                  key={template.name}
-                  className={`rounded-2xl border p-8 hover:scale-[1.02] transition-all cursor-pointer ${
-                    theme === 'dark'
-                      ? 'bg-white/5 backdrop-blur-sm border-white/10 hover:bg-white/10'
-                      : 'bg-white border-gray-200 hover:shadow-lg'
-                  }`}
-                >
-                  <div className={`bg-gradient-to-br ${template.color} p-4 rounded-xl w-fit mb-6 shadow-lg`}>
-                    <Icon className="h-8 w-8 text-white" />
-                  </div>
-                  <h3 className={`text-xl font-bold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                    {template.name}
-                  </h3>
-                  <p className={`text-sm mb-4 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                    {template.description}
-                  </p>
-                  <button className={`text-sm font-medium ${
-                    theme === 'dark'
-                      ? 'text-purple-400 hover:text-purple-300'
-                      : 'text-purple-600 hover:text-purple-700'
-                  }`}>
-                    Use Template →
-                  </button>
-                </div>
-              )
-            })}
+
+            <div className={`rounded-2xl border-2 border-dashed p-12 flex flex-col items-center justify-center text-center ${
+              theme === 'dark'
+                ? 'border-white/10 hover:border-white/20'
+                : 'border-gray-300 hover:border-purple-300'
+            } transition-all cursor-pointer`}>
+              <Plus className={`h-12 w-12 mb-4 ${theme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`} />
+              <h3 className={`text-lg font-semibold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
+                Create New Workflow
+              </h3>
+              <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                Import from GitHub or build from scratch
+              </p>
+            </div>
           </div>
         )}
-
-        <div className={`rounded-2xl border p-8 ${
-          theme === 'dark'
-            ? 'bg-gradient-to-br from-purple-500/10 to-pink-500/10 border-purple-400/30'
-            : 'bg-gradient-to-br from-purple-50 to-pink-50 border-purple-200'
-        }`}>
-          <div className="flex items-center space-x-4 mb-4">
-            <div className="bg-gradient-to-br from-purple-500 to-pink-500 p-3 rounded-xl shadow-lg shadow-purple-500/30">
-              <Workflow className="h-6 w-6 text-white" />
-            </div>
-            <div>
-              <h3 className={`text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                Visual Workflow Builder
-              </h3>
-              <p className={`${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                Build complex automation workflows with drag-and-drop interface
-              </p>
-            </div>
-          </div>
-          <div className="grid md:grid-cols-3 gap-6 mt-6">
-            <div className={`p-6 rounded-xl ${
-              theme === 'dark' ? 'bg-white/5' : 'bg-white/80'
-            }`}>
-              <Zap className={`h-8 w-8 mb-3 ${theme === 'dark' ? 'text-yellow-400' : 'text-yellow-600'}`} />
-              <h4 className={`font-bold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                Fast Execution
-              </h4>
-              <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                Run workflows in milliseconds with optimized execution engine
-              </p>
-            </div>
-            <div className={`p-6 rounded-xl ${
-              theme === 'dark' ? 'bg-white/5' : 'bg-white/80'
-            }`}>
-              <Settings className={`h-8 w-8 mb-3 ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`} />
-              <h4 className={`font-bold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                Flexible Configuration
-              </h4>
-              <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                Customize every aspect of your automation workflows
-              </p>
-            </div>
-            <div className={`p-6 rounded-xl ${
-              theme === 'dark' ? 'bg-white/5' : 'bg-white/80'
-            }`}>
-              <Database className={`h-8 w-8 mb-3 ${theme === 'dark' ? 'text-green-400' : 'text-green-600'}`} />
-              <h4 className={`font-bold mb-2 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>
-                Data Integration
-              </h4>
-              <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                Connect to databases, APIs, and external services seamlessly
-              </p>
-            </div>
-          </div>
-        </div>
       </div>
     </Layout>
   )
 }
-
