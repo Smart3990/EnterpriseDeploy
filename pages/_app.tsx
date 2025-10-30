@@ -1,6 +1,7 @@
 import '@/styles/globals.css'
 import type { AppProps } from 'next/app'
 import { useEffect } from 'react'
+import { ThemeProvider } from '@/contexts/ThemeContext'
 
 export default function App({ Component, pageProps }: AppProps) {
   useEffect(() => {
@@ -14,5 +15,9 @@ export default function App({ Component, pageProps }: AppProps) {
     }
   }, [])
 
-  return <Component {...pageProps} />
+  return (
+    <ThemeProvider>
+      <Component {...pageProps} />
+    </ThemeProvider>
+  )
 }
