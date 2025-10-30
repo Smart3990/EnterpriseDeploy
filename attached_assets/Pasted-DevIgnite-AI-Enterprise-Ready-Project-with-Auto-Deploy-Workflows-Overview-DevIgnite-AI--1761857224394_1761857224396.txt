@@ -1,0 +1,648 @@
+DevIgnite AI – Enterprise-Ready Project with Auto-Deploy Workflows
+
+## 🚀 Overview
+**DevIgnite AI** is a comprehensive AI-driven development and marketing suite engineered for zero-cost deployment, scalable automation, and enterprise-grade reliability. Inspired by Lovable’s simplicity, it integrates **AI generation, design tools, automation, analytics**, and **auto-deployment pipelines**.
+
+---
+
+## 🧩 Features
+- **Unified Interface:** Lovable-inspired design, responsive, and modular.
+- **AI Studio:** Generate text, images, voices, and videos with fallback providers (Groq → Gemini → HuggingFace → Ollama).
+- **Automation Hub:** n8n integration (800+ free workflows) and Supabase Edge triggers.
+- **Business Suite:** Analytics, invoices, client management.
+- 🔥 **Lovable-Inspired UI** – Soft gradients, rounded cards, dark mode aesthetic.
+- 💡 **AI Content Generator** – Text, image, voice, and video generation using free APIs.
+- 📅 **Social Scheduler** – Post automation with fallback queue system.
+- 🎨 **Design Studio** – Fabric.js-based canvas for live asset creation.
+- ⚙️ **Automation Hub** – n8n + Supabase-driven visual workflows.
+- 📊 **Analytics Dashboard** – Real-time Supabase data visualization.
+- 🧠 **Multi-AI Fallback Engine** – Groq → Gemini → HuggingFace → Ollama.
+- 🚀 **Auto Deploy** – One-click deploy to GitHub, Netlify, and Vercel.
+
+### ⚡ DevIgnite Studio (Enhanced Layer)
+- **AI Content Studio**: Text, Image, Voice, and Video generation.
+- **Marketing Suite**: Social Media Scheduler (Buffer API free tier), AI asset library, and automation workflows.
+- **Automation Engine**: Visual workflow builder (n8n + Supabase Edge), 800+ templates.
+- **Business Tools**: Invoice generator, analytics dashboard, client portal.
+- **Data Layer**: Supabase + PlanetScale + Pinecone (vector DB).
+- **Auto Deploy**: GitHub, Netlify, Vercel, and Cloudflare Pages integration.
+
+### 💡 AI Providers (Zero-Cost Multi-Provider Strategy)
+| Type | Primary | Secondary | Fallbacks |
+|------|----------|------------|------------|
+| Text | Groq (Llama 3.1) | Gemini Flash | HuggingFace, Ollama |
+| Image | Pollinations | Craiyon | HuggingFace SDXL |
+| Voice | Coqui TTS | ElevenLabs | Play.ht |
+| Video | Deforum | RunwayML (5s Free) | Colab Integration |
+
+Each provider is automatically chained with fallback logic for continuous uptime.
+
+---
+
+## 🏗️ Architecture Overview
+```
+/devignite-ai/
+ ├── src/
+ │   ├── core/           # Core app (Editor, Auth, Preview)
+ │   ├── studio/         # Advanced Studio features
+ │   │   ├── marketing/  # AI content, scheduler, asset tools
+ │   │   ├── automation/ # n8n & Supabase workflows
+ │   │   ├── business/   # Analytics, invoicing, client tools
+ │   │   └── ai/         # AI proxy & fallback engine
+ │   ├── shared/         # Hooks, contexts, and utils
+ │   └── config/         # Feature flags and kill-switches
+ ├── app/api/            # Next.js API routes (AI proxy, deploy, analytics)
+ ├── migrations/         # Supabase SQL schema + RLS policies
+ ├── .env.example        # Environment variable template
+ ├── tailwind.config.js  # Lovable design system
+ └── README.md           # Documentation and usage guide
+```
+
+---
+
+## 🧰 Deployment Stack (All Free Tier)
+| Layer | Provider | Free Limit |
+|--------|-----------|-------------|
+| Frontend | Vercel / Cloudflare Pages | 100GB+ bandwidth |
+## 🚀 Setup Instructions (for Replit AI)
+  return (
+    <motion.div initial={{opacity:0,y:10}} animate={{opacity:1,y:0}} transition={{duration:0.8}} className="bg-gradient-to-br from-[#131336] to-[#26266a] p-8 rounded-2xl border border-white/10 space-y-6">
+      <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+        <WorkflowIcon className="w-6 h-6 text-green-400"/> Automation Hub (n8n + Supabase)
+      </h2>
+      <p className="text-gray-300">Choose an automation template and let DevIgnite AI handle the rest — zero cost, zero stress.</p>
+      <select value={selectedTemplate} onChange={e=>setSelectedTemplate(e.target.value)} className="p-3 rounded bg-white/10 text-white w-full">
+        {templates.map(t=>(<option key={t.id} value={t.id}>{t.name}</option>))}
+      </select>
+      <div className="p-4 bg-white/5 rounded-xl border border-white/10">
+        {templates.find(t=>t.id===selectedTemplate)?.desc}
+      </div>
+      <button onClick={activateWorkflow} className="px-6 py-3 rounded-xl bg-gradient-to-r from-green-600 to-cyan-600 text-white font-semibold hover:scale-105 transition flex items-center justify-center gap-2">
+        <ZapIcon className="w-4 h-4"/> Activate Workflow
+      </button>
+    </motion.div>
+  );
+}
+
+/* ======= ContentGenerator ======= */
+export function ContentGenerator(){
+  const [mode, setMode] = useState<'text'|'image'|'voice'|'video'>('text');
+  const [prompt, setPrompt] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState<any>(null);
+  async function generate(){
+    if(!prompt.trim()) return;
+    setLoading(true);
+    try{
+      const chain = {
+        text: ['/api/marketing/proxy/groq','/api/marketing/proxy/gemini','/api/marketing/proxy/huggingface'],
+        image: ['/api/marketing/proxy/pollinations','/api/marketing/proxy/craiyon','/api/marketing/proxy/huggingface'],
+        voice: ['/api/marketing/proxy/coqui','/api/marketing/proxy/elevenlabs'],
+        video: ['/api/marketing/proxy/deforum']
+      } as Record<string,string[]>;
+      let output = null;
+      for(const endpoint of chain[mode]){
+        try{ const res = await fetch(endpoint, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ prompt }) }); const j = await res.json(); if(j?.success || j?.url || j?.text){ output = j; break; } }catch(e){ continue; }
+      }
+      setResult(output);
+    }catch(e){ console.error(e); }
+    finally{ setLoading(false); }
+  }
+  return (
+    <motion.div initial={{opacity:0,y:8}} animate={{opacity:1,y:0}} className="bg-gradient-to-br from-[#0f0f1f] to-[#1f1f3f] p-6 rounded-2xl shadow-lg border border-white/10 space-y-4">
+      <h3 className="text-xl font-semibold text-white flex items-center gap-2"><Sparkles className="w-5 h-5 text-pink-400"/> DevIgnite AI Content</h3>
+      <div className="flex flex-col md:flex-row gap-3">
+        <select value={mode} onChange={e=>setMode(e.target.value as any)} className="p-3 rounded bg-white/10 text-white">
+          <option value="text">Text</option>
+          <option value="image">Image</option>
+          <option value="voice">Voice</option>
+          <option value="video">Video</option>
+        </select>
+        <input value={prompt} onChange={e=>setPrompt(e.target.value)} placeholder="Describe what you want to generate..." className="flex-1 p-3 rounded bg-white/10 text-white" />
+        <button onClick={generate} disabled={loading} className="px-4 py-2 rounded bg-gradient-to-r from-purple-600 to-pink-600 text-white">{loading? 'Generating...':'Generate'}</button>
+      </div>
+      <div className="bg-black/30 p-4 rounded border border-white/10 min-h-[120px]">
+        {result ? (
+          <div className="space-y-2">
+            {result.url && <img src={result.url} alt="generated" className="max-w-full rounded" />}
+            {result.text && <pre className="text-white whitespace-pre-wrap">{result.text}</pre>}
+          </div>
+        ) : (
+          <div className="text-gray-400">No results — try generating content.</div>
+        )}
+      </div>
+    </motion.div>
+  );
+}
+
+/* ======= SocialScheduler ======= */
+export function SocialScheduler(){
+  const [platform, setPlatform] = useState('twitter');
+  const [text, setText] = useState('');
+  const [scheduledAt, setScheduledAt] = useState('');
+  async function schedule(){
+    try{
+      const res = await fetch('/api/marketing/social/schedule', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ platform, content: text, scheduledAt }) });
+      const j = await res.json();
+      alert(j?.success ? 'Scheduled' : 'Queued to fallback');
+    }catch(e){ alert('Schedule failed'); }
+  }
+  return (
+    <motion.div initial={{opacity:0,y:6}} animate={{opacity:1,y:0}} className="bg-gradient-to-br from-[#0a0a1f] to-[#19193f] p-6 rounded-2xl border border-white/10">
+      <h3 className="text-lg font-semibold text-white flex items-center gap-2"><CalendarClock className="w-4 h-4 text-pink-400"/> Schedule</h3>
+      <select value={platform} onChange={e=>setPlatform(e.target.value)} className="w-full p-3 rounded bg-white/10 text-white my-2">
+        <option value="twitter">Twitter</option>
+        <option value="instagram">Instagram</option>
+        <option value="facebook">Facebook</option>
+        <option value="linkedin">LinkedIn</option>
+      </select>
+      <textarea value={text} onChange={e=>setText(e.target.value)} className="w-full p-3 rounded bg-white/10 text-white my-2" placeholder="Write your post..." />
+      <input type="datetime-local" value={scheduledAt} onChange={e=>setScheduledAt(e.target.value)} className="w-full p-3 rounded bg-white/10 text-white my-2" />
+      <button onClick={schedule} className="px-4 py-2 rounded bg-gradient-to-r from-blue-600 to-purple-600 text-white">Schedule</button>
+    </motion.div>
+  );
+}
+
+/* ======= DesignStudio ======= */
+export function DesignStudio(){
+  const canvasRef = useRef<any>(null);
+  useEffect(()=>{
+    (async()=>{
+      try{
+        const fabric = await import('fabric');
+        const fab = (fabric as any).fabric || (fabric as any);
+        const canvas = new fab.Canvas('ignite-design-canvas', { backgroundColor: '#fff' });
+        canvas.setHeight(700); canvas.setWidth(1200);
+        canvasRef.current = canvas;
+      }catch(e){ console.warn('Fabric not available'); }
+    })();
+    return ()=>{ try{ canvasRef.current?.dispose?.(); }catch(e){} };
+  },[]);
+  return (
+    <motion.div initial={{opacity:0}} animate={{opacity:1}} className="p-6 bg-gradient-to-br from-[#0f0f1f] to-[#24244f] rounded-2xl shadow-lg">
+      <h3 className="text-lg font-semibold text-white mb-3">Design Studio</h3>
+      <canvas id="ignite-design-canvas" className="rounded border border-white/10" />
+      <div className="flex gap-3 mt-4">
+        <button className="px-4 py-2 rounded bg-gradient-to-r from-purple-600 to-pink-600 text-white">Add Text</button>
+        <button className="px-4 py-2 rounded bg-gradient-to-r from-blue-600 to-cyan-600 text-white">Add Image</button>
+      </div>
+    </motion.div>
+  );
+}
+
+/* ======= SuperComboIntegration ======= */
+export function SuperComboIntegration(){
+  return (
+    <motion.div initial={{opacity:0,y:10}} animate={{opacity:1,y:0}} transition={{duration:0.8}} className="bg-gradient-to-r from-[#141432] to-[#1c1c4b] p-8 rounded-2xl border border-white/10 space-y-6">
+      <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+        <ZapIcon className="w-6 h-6 text-yellow-400"/> DevIgnite AI Super Combos
+      </h2>
+      <p className="text-gray-300">Seamlessly unify AI content generation, design, automation, and business insights under one Lovable-inspired interface.</p>
+      <div className="grid md:grid-cols-4 gap-4">
+        <div className="p-4 rounded-xl bg-white/5 text-center border border-white/10">
+          <WorkflowIcon className="mx-auto text-purple-400 w-8 h-8 mb-2"/>
+          <p className="font-semibold text-white">Automation via n8n & Supabase Edge</p>
+        </div>
+        <div className="p-4 rounded-xl bg-white/5 text-center border border-white/10">
+          <Layers className="mx-auto text-pink-400 w-8 h-8 mb-2"/>
+          <p className="font-semibold text-white">Hybrid Live Preview (Bolt + Replit)</p>
+        </div>
+        <div className="p-4 rounded-xl bg-white/5 text-center border border-white/10">
+          <BarChart2 className="mx-auto text-blue-400 w-8 h-8 mb-2"/>
+          <p className="font-semibold text-white">Analytics Dashboard w/ Supabase</p>
+        </div>
+        <div className="p-4 rounded-xl bg-white/5 text-center border border-white/10">
+          <ZapIcon className="mx-auto text-yellow-400 w-8 h-8 mb-2"/>
+          <p className="font-semibold text-white">AI Fallbacks: Groq → Gemini → HF</p>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+/* ======= Index exports ======= */
+export default {
+  ContentGenerator,
+  SocialScheduler,
+  DesignStudio,
+  SuperComboIntegration,
+  AnalyticsDashboard,
+  AutomationHub
+};
+
+// ===== ENTERPRISE UPGRADE LAYER FOR DevIgnite AI =====
+// This file is the consolidated canvas bundle for DevIgnite AI. The section below adds
+// enterprise-grade scaffolding: Auth (SSO placeholder), RBAC, Audit logging, Rate limiting,
+// circuit-breaker for provider calls, secure preview sandbox orchestrator, observability hooks,
+// DB migration SQL for enterprise tables, and deployment checklist.
+
+/* -------------------------------------------------------------------------- */
+/* --------------------------- ENTERPRISE FEATURES -------------------------- */
+/* -------------------------------------------------------------------------- */
+
+// 1) Type definitions (shared)
+export type Role = 'user' | 'editor' | 'admin' | 'org_admin';
+export interface User {
+  id: string;
+  email: string;
+  name?: string;
+  role: Role;
+  orgId?: string;
+}
+
+// 2) Auth context + SSO / SAML placeholder (client-side wrapper)
+import createAuth0Client from '@auth0/auth0-spa-js'; // dev note: add this dependency in real repo
+
+const AuthContext = React.createContext<{
+  user: User | null;
+  signin: () => Promise<void>;
+  signout: () => Promise<void>;
+  hasRole: (r: Role) => boolean;
+}>({ user: null, signin: async ()=>{}, signout: async ()=>{}, hasRole: ()=>false });
+
+export function AuthProvider({ children }: { children: React.ReactNode }){
+  const [user, setUser] = useState<User|null>(null);
+
+  useEffect(()=>{
+    // Initialize SSO client (Auth0 shown as placeholder)
+    (async()=>{
+      try{
+        const client = await createAuth0Client({ domain: process.env.NEXT_PUBLIC_AUTH0_DOMAIN||'', client_id: process.env.NEXT_PUBLIC_AUTH0_CLIENT_ID||'' });
+        const isAuthenticated = await client.isAuthenticated();
+        if(isAuthenticated){ const u = await client.getUser(); setUser({ id: u.sub, email: u.email, name: u.name, role: 'user' }); }
+      }catch(e){ console.warn('SSO init failed'); }
+    })();
+  },[]);
+
+  async function signin(){ /* redirect to SSO */ }
+  async function signout(){ /* SSO logout */ setUser(null); }
+  function hasRole(r: Role){ return !!user && (user.role === r || user.role === 'admin' || user.role === 'org_admin'); }
+
+  return <AuthContext.Provider value={{ user, signin, signout, hasRole }}>{children}</AuthContext.Provider>;
+}
+
+export function useAuth(){ return React.useContext(AuthContext); }
+
+// 3) Error Boundary + Sentry integration stub
+import * as Sentry from '@sentry/browser';
+Sentry.init({ dsn: process.env.NEXT_PUBLIC_SENTRY_DSN || '' });
+
+export class ErrorBoundary extends React.Component<any, { hasError: boolean }>{
+  constructor(props:any){ super(props); this.state = { hasError:false }; }
+  static getDerivedStateFromError(){ return { hasError:true }; }
+  componentDidCatch(error:any, info:any){ Sentry.captureException(error); console.error(error, info); }
+  render(){ if(this.state.hasError) return <div className="p-6 bg-red-900 text-white rounded">Something went wrong — contact support.</div>; return this.props.children; }
+}
+
+// 4) API client with circuit-breaker + retries + audit logging
+async function auditLog(userId:string|null, action:string, meta:any){
+  try{ await fetch('/api/enterprise/audit', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ userId, action, meta, ts: new Date().toISOString() }) }); }catch(e){ console.warn('Audit log failed'); }
+}
+
+export async function safeApi(endpoint:string, options:RequestInit={}){
+  // simple retry + circuit-breaker placeholder
+  const MAX_RETRY = 2; let attempt = 0; let lastErr:any = null;
+  while(attempt <= MAX_RETRY){
+    try{
+      const res = await fetch(endpoint, options);
+      if(!res.ok) throw new Error(`HTTP ${res.status}`);
+      return await res.json();
+    }catch(e){ lastErr = e; attempt++; const backoff = 200 * attempt; await new Promise(r=>setTimeout(r, backoff)); }
+  }
+  // after retries, record to audit/ops
+  Sentry.captureMessage(`API failure: ${endpoint} - ${String(lastErr)}`);
+  throw lastErr;
+}
+
+// 5) Rate limiter (client-side guard; server must enforce real limits)
+const RATE_LIMIT_BUCKETS: Record<string, { tokens:number, last:number }> = {};
+export function checkRate(key:string, limit=60){
+  const now = Date.now(); const bucket = RATE_LIMIT_BUCKETS[key] || { tokens: limit, last: now };
+  const elapsed = (now - bucket.last) / 1000; bucket.tokens = Math.min(limit, bucket.tokens + elapsed * (limit/60)); bucket.last = now;
+  if(bucket.tokens < 1){ RATE_LIMIT_BUCKETS[key]=bucket; return false; }
+  bucket.tokens -= 1; RATE_LIMIT_BUCKETS[key]=bucket; return true;
+}
+
+// 6) Preview sandbox orchestrator component (server-side must implement /api/preview/run with sandboxing)
+export function PreviewRunner({ projectId, files }: { projectId?: string, files?: Record<string,string> }){
+  const [status, setStatus] = useState('idle'); const [logs, setLogs] = useState<string[]>([]);
+  async function run(){
+    if(!checkRate('preview_run')){ alert('Rate limit reached — try later'); return; }
+    setStatus('queued');
+    try{
+      const res = await safeApi('/api/preview/run', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ projectId, files }) });
+      setStatus(res.status || 'running');
+      setLogs(res.logs || []);
+      auditLog(null, 'preview.run', { projectId });
+    }catch(e){ setStatus('failed'); Sentry.captureException(e); }
+  }
+  return (
+    <div className="space-y-2">
+      <button onClick={run} className="px-4 py-2 rounded bg-indigo-600 text-white">Run Preview</button>
+      <div className="bg-black/20 p-2 rounded min-h-[80px] font-mono text-sm text-white">{logs.map((l,i)=>(<div key={i}>{l}</div>))}</div>
+      <div className="text-sm text-gray-300">Status: {status}</div>
+    </div>
+  );
+}
+
+// 7) DB Migration SQL for enterprise tables (apply on Supabase/PG)
+export const ENTERPRISE_MIGRATIONS = `
+-- tenants and users
+CREATE TABLE tenants ( id uuid PRIMARY KEY DEFAULT gen_random_uuid(), name text, created_at timestamptz DEFAULT now());
+ALTER TABLE auth.users ADD COLUMN tenant_id uuid REFERENCES tenants(id);
+
+-- audit logs
+CREATE TABLE enterprise_audit ( id uuid PRIMARY KEY DEFAULT gen_random_uuid(), tenant_id uuid, user_id uuid, action text, meta jsonb, created_at timestamptz DEFAULT now());
+
+-- admin settings
+CREATE TABLE enterprise_settings ( id uuid PRIMARY KEY DEFAULT gen_random_uuid(), tenant_id uuid REFERENCES tenants(id), key text, value jsonb, updated_at timestamptz DEFAULT now());
+
+-- preview runs (sandbox)
+CREATE TABLE preview_runs ( id uuid PRIMARY KEY DEFAULT gen_random_uuid(), tenant_id uuid, project_id uuid, status text, logs text[], started_at timestamptz, finished_at timestamptz );
+`;
+
+// 8) Ops & deployment checklist (short)
+export const ENTERPRISE_DEPLOY_CHECKLIST = `
+1. Use Supabase Pro / PlanetScale for production DB
+2. Enable Sentry and set DSN
+3. Deploy Edge Functions for provider proxies and preview runner
+4. Configure SSO (Auth0 / Okta) with SAML/OIDC
+5. Implement server-side rate limits and quotas per tenant
+6. Add autoscaling and monitoring dashboards (Prometheus/Grafana)
+7. Run security audit and pen-test
+`;
+
+// 9) Secure provider proxy pattern (server-side required)
+// Client must call /api/marketing/generate which rotates between providers and never exposes keys. Example client usage in ContentGenerator:
+// await safeApi('/api/marketing/generate', { method:'POST', body: JSON.stringify({ prompt, type: 'text' }) });
+
+/* -------------------------------------------------------------------------- */
+/* --------------------------- END ENTERPRISE LAYER -------------------------- */
+/* -------------------------------------------------------------------------- */
+
+// Note: When splitting this monolith into real files, keep the AuthProvider, ErrorBoundary,
+// safeApi, auditLog, PreviewRunner, migrations, and checklist as separate modules under
+// src/lib/enterprise/ so they can be imported by UI components.
+
+// ====== FULL IMPLEMENTATION BUNDLE FOR DevIgnite AI ======
+// This consolidated textdoc includes:
+// - Frontend React components (Lovable UI) (single-module style to avoid duplicate imports in canvas)
+// - Next.js API route stubs (server-side) for provider proxies, preview runner, n8n import, audit
+// - Supabase SQL migrations including RLS policy examples
+// - .env.example and deployment checklist
+// - Notes on zero-cost strategy and fallbacks
+
+/* -------------------------------------------------------------------------- */
+/* ----------------------------- FRONTEND MODULE ---------------------------- */
+/* -------------------------------------------------------------------------- */
+
+import React, { useState, useEffect, useRef } from 'react';
+import { motion } from 'framer-motion';
+import {
+  Sparkles,
+  CalendarClock,
+  Send,
+  Workflow as WorkflowIcon,
+  Zap as ZapIcon,
+  BarChart2,
+  Layers
+} from 'lucide-react';
+import {
+  LineChart,
+  Line,
+  CartesianGrid,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer
+} from 'recharts';
+
+// --- (components same as before - included for completeness) ---
+export function AnalyticsDashboard(){
+  const [data, setData] = useState<any[]>([]);
+  useEffect(()=>{(async()=>{try{ const res = await fetch('/api/analytics'); const json = await res.json(); setData(json.data || []);}catch(e){console.warn('Analytics load failed')}})();},[]);
+  return (
+    <motion.div initial={{opacity:0,y:10}} animate={{opacity:1,y:0}} transition={{duration:0.8}} className="bg-gradient-to-br from-[#101020] to-[#21215a] p-8 rounded-2xl border border-white/10 space-y-6">
+      <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-blue-500 text-transparent bg-clip-text">Analytics Dashboard</h2>
+      <div style={{ width: '100%', height: 300 }}>
+        <ResponsiveContainer width="100%" height={300}>
+          <LineChart data={data}>
+            <Line type="monotone" dataKey="value" stroke="#8b5cf6" strokeWidth={2} />
+            <CartesianGrid stroke="#444" strokeDasharray="3 3" />
+            <XAxis dataKey="label" stroke="#ccc" /><YAxis stroke="#ccc" /><Tooltip />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
+    </motion.div>
+  );
+}
+
+export function AutomationHub(){
+  const [selectedTemplate, setSelectedTemplate] = useState('blog-to-social');
+  const templates = [
+    { id: 'blog-to-social', name: 'Blog → Social Media Auto-Post', desc: 'Post your new blog entries directly to socials.' },
+    { id: 'github-to-slack', name: 'GitHub → Slack Alert', desc: 'Send Slack alerts for new pull requests.' },
+    { id: 'invoice-email', name: 'Invoice → Email Delivery', desc: 'Automatically email invoices after generation.' }
+  ];
+  function activateWorkflow(){ alert(`Workflow '${selectedTemplate}' activated using n8n free-node or Supabase Edge!`); }
+  return (
+    <motion.div className="bg-gradient-to-br from-[#131336] to-[#26266a] p-8 rounded-2xl border border-white/10 space-y-6">
+      <h2 className="text-2xl font-bold text-white flex items-center gap-2"><WorkflowIcon className="w-6 h-6 text-green-400"/> Automation Hub (n8n + Supabase)</h2>
+      <p className="text-gray-300">Choose an automation template and let DevIgnite AI handle the rest — zero cost, zero stress.</p>
+      <select value={selectedTemplate} onChange={e=>setSelectedTemplate(e.target.value)} className="p-3 rounded bg-white/10 text-white w-full">{templates.map(t=>(<option key={t.id} value={t.id}>{t.name}</option>))}</select>
+      <div className="p-4 bg-white/5 rounded-xl border border-white/10">{templates.find(t=>t.id===selectedTemplate)?.desc}</div>
+      <button onClick={activateWorkflow} className="px-6 py-3 rounded-xl bg-gradient-to-r from-green-600 to-cyan-600 text-white font-semibold hover:scale-105 transition flex items-center justify-center gap-2"><ZapIcon className="w-4 h-4"/> Activate Workflow</button>
+    </motion.div>
+  );
+}
+
+export function ContentGenerator(){
+  const [mode, setMode] = useState<'text'|'image'|'voice'|'video'>('text');
+  const [prompt, setPrompt] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState<any>(null);
+  async function generate(){ if(!prompt.trim()) return; setLoading(true);
+    try{
+      const chain = { text: ['/api/marketing/proxy/groq','/api/marketing/proxy/gemini','/api/marketing/proxy/huggingface'], image: ['/api/marketing/proxy/pollinations','/api/marketing/proxy/craiyon','/api/marketing/proxy/huggingface'], voice: ['/api/marketing/proxy/coqui','/api/marketing/proxy/elevenlabs'], video: ['/api/marketing/proxy/deforum'] } as Record<string,string[]>;
+      let output = null; for(const endpoint of chain[mode]){ try{ const res = await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt})}); const j = await res.json(); if(j?.success||j?.url||j?.text){ output=j; break; } }catch(e){ continue; } }
+      setResult(output);
+    }catch(e){ console.error(e); }
+    finally{ setLoading(false); }
+  }
+  return (
+    <motion.div className="bg-gradient-to-br from-[#0f0f1f] to-[#1f1f3f] p-6 rounded-2xl shadow-lg border border-white/10 space-y-4">
+      <h3 className="text-xl font-semibold text-white flex items-center gap-2"><Sparkles className="w-5 h-5 text-pink-400"/> DevIgnite AI Content</h3>
+      <div className="flex flex-col md:flex-row gap-3">
+        <select value={mode} onChange={e=>setMode(e.target.value as any)} className="p-3 rounded bg-white/10 text-white"><option value="text">Text</option><option value="image">Image</option><option value="voice">Voice</option><option value="video">Video</option></select>
+        <input value={prompt} onChange={e=>setPrompt(e.target.value)} placeholder="Describe what you want to generate..." className="flex-1 p-3 rounded bg-white/10 text-white" />
+        <button onClick={generate} disabled={loading} className="px-4 py-2 rounded bg-gradient-to-r from-purple-600 to-pink-600 text-white">{loading? 'Generating...':'Generate'}</button>
+      </div>
+      <div className="bg-black/30 p-4 rounded border border-white/10 min-h-[120px]">{result? (<div className="space-y-2">{result.url && <img src={result.url} alt="generated" className="max-w-full rounded"/>}{result.text && <pre className="text-white whitespace-pre-wrap">{result.text}</pre>}</div>) : (<div className="text-gray-400">No results — try generating content.</div>)}</div>
+    </motion.div>
+  );
+}
+
+export function SocialScheduler(){
+  const [platform, setPlatform] = useState('twitter'); const [text, setText] = useState(''); const [scheduledAt, setScheduledAt] = useState('');
+  async function schedule(){ try{ const res = await fetch('/api/marketing/social/schedule',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({platform,content:text,scheduledAt})}); const j = await res.json(); alert(j?.success ? 'Scheduled' : 'Queued to fallback'); }catch(e){ alert('Schedule failed'); } }
+  return (
+    <motion.div className="bg-gradient-to-br from-[#0a0a1f] to-[#19193f] p-6 rounded-2xl border border-white/10">
+      <h3 className="text-lg font-semibold text-white flex items-center gap-2"><CalendarClock className="w-4 h-4 text-pink-400"/> Schedule</h3>
+      <select value={platform} onChange={e=>setPlatform(e.target.value)} className="w-full p-3 rounded bg-white/10 text-white my-2"><option value="twitter">Twitter</option><option value="instagram">Instagram</option><option value="facebook">Facebook</option><option value="linkedin">LinkedIn</option></select>
+      <textarea value={text} onChange={e=>setText(e.target.value)} className="w-full p-3 rounded bg-white/10 text-white my-2" placeholder="Write your post..." />
+      <input type="datetime-local" value={scheduledAt} onChange={e=>setScheduledAt(e.target.value)} className="w-full p-3 rounded bg-white/10 text-white my-2" />
+      <button onClick={schedule} className="px-4 py-2 rounded bg-gradient-to-r from-blue-600 to-purple-600 text-white">Schedule</button>
+    </motion.div>
+  );
+}
+
+export function DesignStudio(){
+  const canvasRef = useRef<any>(null);
+  useEffect(()=>{(async()=>{try{const fabric = await import('fabric'); const fab = (fabric as any).fabric || (fabric as any); const canvas = new fab.Canvas('ignite-design-canvas',{backgroundColor:'#fff'}); canvas.setHeight(700); canvas.setWidth(1200); canvasRef.current = canvas;}catch(e){console.warn('Fabric not available');}})(); return ()=>{try{canvasRef.current?.dispose?.();}catch(e){}};},[]);
+  return (
+    <motion.div className="p-6 bg-gradient-to-br from-[#0f0f1f] to-[#24244f] rounded-2xl shadow-lg">
+      <h3 className="text-lg font-semibold text-white mb-3">Design Studio</h3>
+      <canvas id="ignite-design-canvas" className="rounded border border-white/10" />
+      <div className="flex gap-3 mt-4">
+        <button className="px-4 py-2 rounded bg-gradient-to-r from-purple-600 to-pink-600 text-white">Add Text</button>
+        <button className="px-4 py-2 rounded bg-gradient-to-r from-blue-600 to-cyan-600 text-white">Add Image</button>
+      </div>
+    </motion.div>
+  );
+}
+
+export function SuperComboIntegration(){
+  return (
+    <motion.div className="bg-gradient-to-r from-[#141432] to-[#1c1c4b] p-8 rounded-2xl border border-white/10 space-y-6">
+      <h2 className="text-2xl font-bold text-white flex items-center gap-2"><ZapIcon className="w-6 h-6 text-yellow-400"/> DevIgnite AI Super Combos</h2>
+      <p className="text-gray-300">Seamlessly unify AI content generation, design, automation, and business insights under one Lovable-inspired interface.</p>
+      <div className="grid md:grid-cols-4 gap-4"> <div className="p-4 rounded-xl bg-white/5 text-center border border-white/10"><WorkflowIcon className="mx-auto text-purple-400 w-8 h-8 mb-2"/><p className="font-semibold text-white">Automation via n8n & Supabase Edge</p></div> <div className="p-4 rounded-xl bg-white/5 text-center border border-white/10"><Layers className="mx-auto text-pink-400 w-8 h-8 mb-2"/><p className="font-semibold text-white">Hybrid Live Preview (Bolt + Replit)</p></div> <div className="p-4 rounded-xl bg-white/5 text-center border border-white/10"><BarChart2 className="mx-auto text-blue-400 w-8 h-8 mb-2"/><p className="font-semibold text-white">Analytics Dashboard w/ Supabase</p></div> <div className="p-4 rounded-xl bg-white/5 text-center border border-white/10"><ZapIcon className="mx-auto text-yellow-400 w-8 h-8 mb-2"/><p className="font-semibold text-white">AI Fallbacks: Groq → Gemini → HF</p></div> </div>
+    </motion.div>
+  );
+}
+
+export default { ContentGenerator, SocialScheduler, DesignStudio, SuperComboIntegration, AnalyticsDashboard, AutomationHub };
+
+/* -------------------------------------------------------------------------- */
+/* ----------------------------- SERVER API STUBS ---------------------------- */
+/* -------------------------------------------------------------------------- */
+
+// The following are Next.js / Edge-style API route templates. Place these under app/api/...
+// They are minimal, zero-cost-first stubs that implement provider rotation, n8n import, preview run
+// orchestration, and audit logging. Replace placeholder logic with real calls when keys are available.
+
+/* ===== app/api/marketing/proxy/groq/route.ts (Next.js) ===== */
+export async function POST(req: Request) {
+  try{
+    const body = await req.json(); const prompt = body.prompt || '';
+    // Zero-cost: if GROQ key missing, return canned response or proxy to HF free model
+    if(!process.env.GROQ_API_KEY){
+      // fallback simulated response
+      return new Response(JSON.stringify({ success: true, text: `Groq-fallback: ${prompt.slice(0,200)}` }), { status: 200 });
+    }
+    // Real call (placeholder) -- implement server-side SDK usage
+    return new Response(JSON.stringify({ success: true, text: `Groq-real: ${prompt.slice(0,200)}` }), { status: 200 });
+  }catch(e){ return new Response(JSON.stringify({ success:false, error:String(e) }), { status:500 }); }
+}
+
+/* ===== app/api/marketing/proxy/pollinations/route.ts ===== */
+export async function POST(req: Request){ try{ const body = await req.json(); const prompt = body.prompt || ''; const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=1024&height=1024&seed=${Math.floor(Math.random()*1e6)}`; return new Response(JSON.stringify({ success:true, url }), { status:200 }); }catch(e){ return new Response(JSON.stringify({ success:false }),{status:500}); } }
+
+/* ===== app/api/marketing/proxy/craiyon/route.ts ===== */
+export async function POST(req: Request){ try{ const body = await req.json(); const prompt = body.prompt || ''; // Craiyon requires server-side call; here we return placeholder URL
+  return new Response(JSON.stringify({ success:true, url: `https://craiyon.example/${encodeURIComponent(prompt)}.png` }),{status:200}); }catch(e){ return new Response(JSON.stringify({ success:false }),{status:500}); } }
+
+/* ===== app/api/marketing/proxy/huggingface/route.ts ===== */
+export async function POST(req: Request){ try{ const body = await req.json(); const prompt = body.prompt || ''; if(!process.env.HF_API_KEY) return new Response(JSON.stringify({ success:true, text:`HF-fallback: ${prompt.slice(0,200)}` }),{status:200}); return new Response(JSON.stringify({ success:true, text:`HF-real: ${prompt.slice(0,200)}` }),{status:200}); }catch(e){ return new Response(JSON.stringify({ success:false }),{status:500}); } }
+
+/* ===== app/api/marketing/social/schedule/route.ts ===== */
+export async function POST(req: Request){ try{ const body = await req.json(); // write to Supabase scheduled_posts table or enqueue fallback (server-side)
+  // Zero-cost behavior: persist to Supabase if configured, otherwise return queued
+  if(process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY){
+    // Minimal demo: return success (implementation: insert into table)
+    return new Response(JSON.stringify({ success:true, enqueued:false }),{status:200});
+  }
+  return new Response(JSON.stringify({ success:false, enqueued:true }),{status:200}); }catch(e){ return new Response(JSON.stringify({ success:false }),{status:500}); } }
+
+/* ===== app/api/marketing/automation/n8n-list/route.ts ===== */
+export async function GET(){
+  // Return curated template list (zero-cost: static JSON)
+  const data = [ { id:'blog-to-social', name:'Blog → Social Media', description:'Auto-post blog content' }, { id:'lead-email-campaign', name:'Lead → Email Campaign', description:'Email nurture flow' } ];
+  return new Response(JSON.stringify({ success:true, data }),{status:200});
+}
+
+/* ===== app/api/marketing/automation/n8n-import/route.ts ===== */
+export async function POST(req: Request){ try{ const body = await req.json(); const template = body.template; // Expect user to set N8N_ENDPOINT & N8N_API_KEY in .env
+  if(!process.env.N8N_ENDPOINT || !process.env.N8N_API_KEY) return new Response(JSON.stringify({ success:false, error:'n8n not configured' }),{status:200});
+  // Proxy import to user's n8n instance (server-side)
+  const resp = await fetch(`${process.env.N8N_ENDPOINT}/workflows/import`, { method:'POST', headers:{ 'Authorization': `Bearer ${process.env.N8N_API_KEY}`, 'Content-Type':'application/json' }, body: JSON.stringify(template) });
+  const j = await resp.json(); return new Response(JSON.stringify({ success:true, result:j }),{status:200}); }catch(e){ return new Response(JSON.stringify({ success:false, error:String(e) }),{status:500}); } }
+
+/* ===== app/api/preview/run/route.ts ===== */
+export async function POST(req: Request){ try{ const body = await req.json(); // In production, implement sandboxed runner (Cloudflare Worker, Supabase Edge, or ephemeral container)
+  // Zero-cost fallback: store run request to preview_runs table if Supabase configured, and return queued status
+  if(process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY){
+    // TODO: insert row and trigger edge function
+    return new Response(JSON.stringify({ status:'queued', logs: [] }),{status:200});
+  }
+  return new Response(JSON.stringify({ status:'no-sandbox', logs:['No sandbox configured'] }),{status:200}); }catch(e){ return new Response(JSON.stringify({ status:'error', error:String(e) }),{status:500}); } }
+
+/* ===== app/api/enterprise/audit/route.ts ===== */
+export async function POST(req: Request){ try{ const body = await req.json(); // write to enterprise_audit table in Supabase if configured
+  if(process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY){ /* insert row via supabase REST or SDK */ }
+  return new Response(JSON.stringify({ success:true }),{status:200}); }catch(e){ return new Response(JSON.stringify({ success:false }),{status:500}); } }
+
+/* -------------------------------------------------------------------------- */
+/* ------------------------- SUPABASE RLS & MIGRATIONS ----------------------- */
+/* -------------------------------------------------------------------------- */
+
+-- SQL Migration: enterprise_schema.sql
+-- Apply this to Supabase (psql or SQL editor)
+
+-- tenants
+CREATE TABLE IF NOT EXISTS tenants ( id uuid PRIMARY KEY DEFAULT gen_random_uuid(), name text, created_at timestamptz DEFAULT now());
+
+-- extend auth.users with tenant_id (run as service role key)
+ALTER TABLE IF EXISTS auth.users ADD COLUMN IF NOT EXISTS tenant_id uuid REFERENCES tenants(id);
+
+-- enterprise_audit
+CREATE TABLE IF NOT EXISTS enterprise_audit ( id uuid PRIMARY KEY DEFAULT gen_random_uuid(), tenant_id uuid, user_id uuid, action text, meta jsonb, created_at timestamptz DEFAULT now());
+
+-- preview_runs
+CREATE TABLE IF NOT EXISTS preview_runs ( id uuid PRIMARY KEY DEFAULT gen_random_uuid(), tenant_id uuid, project_id uuid, status text, logs text[], started_at timestamptz, finished_at timestamptz );
+
+-- marketing tables
+CREATE TABLE IF NOT EXISTS marketing_templates ( id uuid PRIMARY KEY DEFAULT gen_random_uuid(), tenant_id uuid, name text, description text, content jsonb, created_at timestamptz DEFAULT now());
+CREATE TABLE IF NOT EXISTS marketing_assets ( id uuid PRIMARY KEY DEFAULT gen_random_uuid(), tenant_id uuid, user_id uuid, url text, type text, provider text, meta jsonb, created_at timestamptz DEFAULT now());
+CREATE TABLE IF NOT EXISTS scheduled_posts ( id uuid PRIMARY KEY DEFAULT gen_random_uuid(), tenant_id uuid, user_id uuid, platform text, content text, media jsonb, scheduled_at timestamptz, status text DEFAULT 'pending', created_at timestamptz DEFAULT now());
+
+-- RLS policies (examples)
+-- Allow users to read/write only rows with their tenant_id
+-- Enable RLS on marketing_assets
+ALTER TABLE marketing_assets ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "tenant_is_owner" ON marketing_assets USING ( tenant_id = current_setting('jwt.claims.tenant_id')::uuid ) WITH CHECK ( tenant_id = current_setting('jwt.claims.tenant_id')::uuid );
+
+-- Note: configure JWT claims mapping in Supabase Auth to include tenant_id on signup/session.
+
+/* -------------------------------------------------------------------------- */
+/* ----------------------------- .env.example ------------------------------- */
+/* -------------------------------------------------------------------------- */
+
+NEXT_PUBLIC_SUPABASE_URL=
+SUPABASE_SERVICE_ROLE_KEY=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+NEXT_PUBLIC_AUTH0_DOMAIN=
+NEXT_PUBLIC_AUTH0_CLIENT_ID=
+GROQ_API_KEY=
+GEMINI_API_KEY=
+HF_API_KEY=
+N8N_ENDPOINT=
+N8N_API_KEY=
+NEXT_PUBLIC_SENTRY_DSN=
+
+/* -------------------------------------------------------------------------- */
+/* ------------------------- DEPLOYMENT & OPERATION ------------------------- */
+/* -------------------------------------------------------------------------- */
+
+Deployment recommendations (zero-cost-first, enterprise-ready path):
+1. Star

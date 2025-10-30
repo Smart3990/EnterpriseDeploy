@@ -32,6 +32,18 @@ export default function Layout({ children }: LayoutProps) {
                 isActive={router.pathname === '/'}
               />
               <NavLink 
+                href="/marketing" 
+                icon={<BarChart3 className="h-4 w-4" />} 
+                text="Marketing"
+                isActive={router.pathname === '/marketing'}
+              />
+              <NavLink 
+                href="/design" 
+                icon={<Sparkles className="h-4 w-4" />} 
+                text="Design"
+                isActive={router.pathname === '/design'}
+              />
+              <NavLink 
                 href="/analytics" 
                 icon={<BarChart3 className="h-4 w-4" />} 
                 text="Analytics"
