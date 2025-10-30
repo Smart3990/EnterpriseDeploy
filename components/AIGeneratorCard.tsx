@@ -24,29 +24,29 @@ export default function AIGeneratorCard({ title, description, provider, onGenera
   }
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 p-6 hover:border-lovable-200 hover:shadow-sm transition-all duration-200">
+    <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6 hover:bg-white/10 transition-all duration-200">
       <div className="mb-5">
         <div className="flex items-center space-x-3 mb-2">
-          <div className="p-2 bg-lovable-100 rounded-lg">
-            <Wand2 className="h-5 w-5 text-lovable-600" />
+          <div className="p-2 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-lg">
+            <Wand2 className="h-5 w-5 text-purple-400" />
           </div>
-          <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+          <h3 className="text-lg font-semibold text-white">{title}</h3>
         </div>
-        <p className="text-sm text-gray-500 ml-12">{description}</p>
+        <p className="text-sm text-gray-400 ml-12">{description}</p>
       </div>
 
       <textarea
         value={prompt}
         onChange={(e) => setPrompt(e.target.value)}
         placeholder="Describe what you want to create..."
-        className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-lovable-500 focus:border-transparent resize-none text-sm placeholder:text-gray-400 transition-all"
+        className="w-full p-4 bg-white/5 border border-white/10 text-white rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none text-sm placeholder:text-gray-500 transition-all"
         rows={3}
       />
 
       <button
         onClick={handleGenerate}
         disabled={loading || !prompt.trim()}
-        className="mt-4 w-full bg-lovable-600 text-white px-6 py-3 rounded-xl font-medium hover:bg-lovable-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center space-x-2"
+        className="mt-4 w-full bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 text-white px-6 py-3 rounded-xl font-medium hover:shadow-lg hover:shadow-pink-500/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center space-x-2"
       >
         {loading ? (
           <>

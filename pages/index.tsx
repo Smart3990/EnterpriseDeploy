@@ -1,10 +1,33 @@
 import { useState } from 'react'
 import Layout from '@/components/Layout'
+import AIGeneratorCard from '@/components/AIGeneratorCard'
 import { Sparkles, ArrowRight, Code, Palette, Megaphone, Workflow as WorkflowIcon } from 'lucide-react'
 import Link from 'next/link'
 
 export default function Home() {
   const [prompt, setPrompt] = useState('')
+  const [results, setResults] = useState<{ provider: string; content: string }[]>([])
+
+  const handleGenerate = async (generatedPrompt: string, provider: string) => {
+    try {
+      const response = await fetch('/api/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: generatedPrompt, provider }),
+      })
+
+      const data = await response.json()
+      
+      if (data.success) {
+        setResults(prev => [{ provider, content: data.content }, ...prev])
+      } else {
+        alert(`Error: ${data.error}`)
+      }
+    } catch (error) {
+      console.error('Generation failed:', error)
+      alert('Failed to generate content. Please check your API keys.')
+    }
+  }
 
   return (
     <Layout>
@@ -45,7 +68,53 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 py-20">
+      <div className="max-w-7xl mx-auto px-6 py-12">
+        <h2 className="text-2xl font-bold text-white mb-8">AI Studio</h2>
+        <div className="grid md:grid-cols-3 gap-6 mb-12">
+          <AIGeneratorCard
+            title="Groq"
+            description="Lightning-fast LLM inference"
+            provider="groq"
+            onGenerate={handleGenerate}
+          />
+          
+          <AIGeneratorCard
+            title="Google Gemini"
+            description="Multimodal AI from Google"
+            provider="gemini"
+            onGenerate={handleGenerate}
+          />
+          
+          <AIGeneratorCard
+            title="HuggingFace"
+            description="100,000+ open-source models"
+            provider="huggingface"
+            onGenerate={handleGenerate}
+          />
+        </div>
+
+        {results.length > 0 && (
+          <div className="mb-12">
+            <h2 className="text-2xl font-bold text-white mb-6">Recent Generations</h2>
+            <div className="space-y-4">
+              {results.map((result, index) => (
+                <div
+                  key={index}
+                  className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 hover:bg-white/10 transition-all"
+                >
+                  <div className="flex items-center space-x-2 mb-3">
+                    <span className="px-3 py-1 bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-400/30 text-purple-300 text-xs font-medium rounded-full">
+                      {result.provider}
+                    </span>
+                  </div>
+                  <p className="text-gray-300 leading-relaxed whitespace-pre-wrap">{result.content}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <h2 className="text-2xl font-bold text-white mb-8">Feature Suite</h2>
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           <Link href="/">
             <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8 hover:bg-white/10 transition-all cursor-pointer group">
