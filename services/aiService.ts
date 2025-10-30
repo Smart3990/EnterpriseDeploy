@@ -28,7 +28,9 @@ export class AIService {
     }
   }
 
-  async generateText(prompt: string, config: AIServiceConfig = { provider: 'groq' }): Promise<string> {
+  async generateText(prompt: string, config: AIServiceConfig = { provider: 'groq' }, attemptedProviders: Set<AIProvider> = new Set()): Promise<string> {
+    attemptedProviders.add(config.provider)
+    
     try {
       switch (config.provider) {
         case 'groq':
@@ -42,7 +44,7 @@ export class AIService {
       }
     } catch (error) {
       console.error(`Error with ${config.provider}:`, error)
-      return this.fallbackGenerate(prompt, config)
+      return this.fallbackGenerate(prompt, config, attemptedProviders)
     }
   }
 
@@ -83,21 +85,25 @@ export class AIService {
     return response.generated_text
   }
 
-  private async fallbackGenerate(prompt: string, config: AIServiceConfig): Promise<string> {
+  private async fallbackGenerate(prompt: string, config: AIServiceConfig, attemptedProviders: Set<AIProvider>): Promise<string> {
     const providers: AIProvider[] = ['groq', 'gemini', 'huggingface']
-    const remainingProviders = providers.filter(p => p !== config.provider)
+    const remainingProviders = providers.filter(p => !attemptedProviders.has(p))
+
+    if (remainingProviders.length === 0) {
+      throw new Error('All AI providers failed. Please check your API keys.')
+    }
 
     for (const provider of remainingProviders) {
       try {
         console.log(`Falling back to ${provider}...`)
-        return await this.generateText(prompt, { provider })
+        return await this.generateText(prompt, { provider }, attemptedProviders)
       } catch (error) {
         console.error(`Fallback to ${provider} failed:`, error)
         continue
       }
     }
 
-    throw new Error('All AI providers failed')
+    throw new Error('All AI providers failed. Please check your API keys.')
   }
 
   async generateImage(prompt: string): Promise<string> {
