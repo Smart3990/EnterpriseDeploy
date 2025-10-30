@@ -1,18 +1,14 @@
 import Layout from '@/components/Layout'
-import { motion } from 'framer-motion'
 import { Key, Database, Shield, Bell } from 'lucide-react'
 
 export default function Settings() {
   return (
     <Layout>
-      <div className="space-y-8">
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Settings</h1>
-          <p className="text-gray-600">Configure your DevIgnite AI environment</p>
-        </motion.div>
+      <div className="space-y-10">
+        <div>
+          <h1 className="text-4xl font-bold text-gray-900 mb-3">Settings</h1>
+          <p className="text-lg text-gray-600">Configure your DevIgnite AI environment</p>
+        </div>
 
         <div className="grid gap-6">
           <SettingsCard
@@ -67,49 +63,31 @@ export default function Settings() {
           </SettingsCard>
         </div>
 
-        <motion.div
-          className="bg-white rounded-xl shadow-lg p-6"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-        >
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <p className="text-sm text-blue-900">
-              <strong>Note:</strong> Update your <code className="bg-blue-100 px-2 py-1 rounded">.env.local</code> file 
-              with these values for them to take effect. Refer to <code className="bg-blue-100 px-2 py-1 rounded">.env.example</code> for all available options.
-            </p>
-          </div>
-        </motion.div>
+        <div className="bg-lovable-50 border border-lovable-200 rounded-2xl p-6">
+          <p className="text-sm text-lovable-900">
+            <strong>Note:</strong> Update your <code className="bg-white px-2.5 py-1 rounded border border-lovable-200 font-mono text-xs">.env.local</code> file 
+            with these values for them to take effect. Refer to <code className="bg-white px-2.5 py-1 rounded border border-lovable-200 font-mono text-xs">.env.example</code> for all available options.
+          </p>
+        </div>
       </div>
     </Layout>
   )
 }
 
-function SettingsCard({ icon, title, description, color, children }: any) {
-  const colorClasses = {
-    blue: 'bg-blue-100 text-blue-600',
-    green: 'bg-green-100 text-green-600',
-    purple: 'bg-purple-100 text-purple-600',
-    pink: 'bg-pink-100 text-pink-600',
-  }
-
+function SettingsCard({ icon, title, description, children }: any) {
   return (
-    <motion.div
-      className="bg-white rounded-xl shadow-lg p-6"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      whileHover={{ boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)' }}
-    >
+    <div className="bg-white rounded-2xl border border-gray-100 p-8 hover:border-lovable-200 transition-all">
       <div className="flex items-center space-x-3 mb-6">
-        <div className={`p-3 rounded-lg ${colorClasses[color]}`}>
+        <div className="p-2.5 rounded-lg bg-lovable-100 text-lovable-600">
           {icon}
         </div>
         <div>
-          <h2 className="text-xl font-bold text-gray-900">{title}</h2>
-          <p className="text-sm text-gray-600">{description}</p>
+          <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
+          <p className="text-sm text-gray-500">{description}</p>
         </div>
       </div>
       {children}
-    </motion.div>
+    </div>
   )
 }
 
@@ -120,7 +98,7 @@ function InputField({ label, placeholder, type = 'text' }: any) {
       <input
         type={type}
         placeholder={placeholder}
-        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+        className="w-full p-3.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-lovable-500 focus:border-transparent text-sm placeholder:text-gray-400 transition-all"
       />
     </div>
   )

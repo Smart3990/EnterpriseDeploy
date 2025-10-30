@@ -1,5 +1,4 @@
 import Layout from '@/components/Layout'
-import { motion } from 'framer-motion'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } from 'recharts'
 import { TrendingUp, Users, Zap, Activity } from 'lucide-react'
 
@@ -25,107 +24,80 @@ const performanceData = [
 export default function Analytics() {
   return (
     <Layout>
-      <div className="space-y-8">
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Analytics Dashboard</h1>
-          <p className="text-gray-600">Monitor your AI usage and performance metrics</p>
-        </motion.div>
+      <div className="space-y-10">
+        <div>
+          <h1 className="text-4xl font-bold text-gray-900 mb-3">Analytics</h1>
+          <p className="text-lg text-gray-600">Monitor your AI usage and performance metrics</p>
+        </div>
 
         <div className="grid md:grid-cols-4 gap-6">
           <StatCard
             title="Total Requests"
             value="12,847"
             change="+12.5%"
-            icon={<Activity className="h-6 w-6" />}
-            color="blue"
+            icon={<Activity className="h-5 w-5" />}
           />
           <StatCard
             title="Active Users"
             value="1,234"
             change="+8.2%"
-            icon={<Users className="h-6 w-6" />}
-            color="green"
+            icon={<Users className="h-5 w-5" />}
           />
           <StatCard
             title="API Calls"
             value="45,892"
             change="+23.1%"
-            icon={<Zap className="h-6 w-6" />}
-            color="purple"
+            icon={<Zap className="h-5 w-5" />}
           />
           <StatCard
             title="Success Rate"
             value="99.8%"
             change="+0.3%"
-            icon={<TrendingUp className="h-6 w-6" />}
-            color="pink"
+            icon={<TrendingUp className="h-5 w-5" />}
           />
         </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-xl shadow-lg p-6"
-        >
-          <h2 className="text-2xl font-bold mb-6 text-gray-900">AI Provider Usage</h2>
+        <div className="bg-white rounded-2xl border border-gray-100 p-8">
+          <h2 className="text-xl font-semibold mb-6 text-gray-900">AI Provider Usage</h2>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={usageData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis />
+              <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
+              <XAxis dataKey="name" tick={{ fill: '#6b7280' }} />
+              <YAxis tick={{ fill: '#6b7280' }} />
               <Tooltip />
               <Legend />
-              <Bar dataKey="groq" fill="#0ea5e9" />
-              <Bar dataKey="gemini" fill="#8b5cf6" />
-              <Bar dataKey="huggingface" fill="#ec4899" />
+              <Bar dataKey="groq" fill="#a855f7" radius={[8, 8, 0, 0]} />
+              <Bar dataKey="gemini" fill="#c084fc" radius={[8, 8, 0, 0]} />
+              <Bar dataKey="huggingface" fill="#d8b4fe" radius={[8, 8, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
-        </motion.div>
+        </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-xl shadow-lg p-6"
-        >
-          <h2 className="text-2xl font-bold mb-6 text-gray-900">Performance Metrics</h2>
+        <div className="bg-white rounded-2xl border border-gray-100 p-8">
+          <h2 className="text-xl font-semibold mb-6 text-gray-900">Performance Metrics</h2>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={performanceData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis yAxisId="left" />
-              <YAxis yAxisId="right" orientation="right" />
+              <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
+              <XAxis dataKey="name" tick={{ fill: '#6b7280' }} />
+              <YAxis yAxisId="left" tick={{ fill: '#6b7280' }} />
+              <YAxis yAxisId="right" orientation="right" tick={{ fill: '#6b7280' }} />
               <Tooltip />
               <Legend />
-              <Line yAxisId="left" type="monotone" dataKey="requests" stroke="#0ea5e9" strokeWidth={2} />
-              <Line yAxisId="right" type="monotone" dataKey="latency" stroke="#ec4899" strokeWidth={2} />
+              <Line yAxisId="left" type="monotone" dataKey="requests" stroke="#a855f7" strokeWidth={3} />
+              <Line yAxisId="right" type="monotone" dataKey="latency" stroke="#d8b4fe" strokeWidth={3} />
             </LineChart>
           </ResponsiveContainer>
-        </motion.div>
+        </div>
       </div>
     </Layout>
   )
 }
 
-function StatCard({ title, value, change, icon, color }: any) {
-  const colorClasses = {
-    blue: 'bg-blue-100 text-blue-600',
-    green: 'bg-green-100 text-green-600',
-    purple: 'bg-purple-100 text-purple-600',
-    pink: 'bg-pink-100 text-pink-600',
-  }
-
+function StatCard({ title, value, change, icon }: any) {
   return (
-    <motion.div
-      className="bg-white rounded-xl shadow-lg p-6"
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      whileHover={{ scale: 1.05, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)' }}
-    >
+    <div className="bg-white rounded-2xl border border-gray-100 p-6 hover:border-lovable-200 transition-all">
       <div className="flex items-center justify-between mb-4">
-        <div className={`p-3 rounded-lg ${colorClasses[color]}`}>
+        <div className="p-2.5 rounded-lg bg-lovable-100 text-lovable-600">
           {icon}
         </div>
         <span className="text-sm font-medium text-green-600">{change}</span>
@@ -134,6 +106,6 @@ function StatCard({ title, value, change, icon, color }: any) {
         <p className="text-gray-600 text-sm mb-1">{title}</p>
         <p className="text-3xl font-bold text-gray-900">{value}</p>
       </div>
-    </motion.div>
+    </div>
   )
 }

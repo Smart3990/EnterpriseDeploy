@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { motion } from 'framer-motion'
 import { Wand2, Loader2 } from 'lucide-react'
 
 interface AIGeneratorCardProps {
@@ -25,50 +24,42 @@ export default function AIGeneratorCard({ title, description, provider, onGenera
   }
 
   return (
-    <motion.div
-      className="bg-white rounded-xl shadow-lg p-6 border border-gray-100"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      whileHover={{ scale: 1.02, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)' }}
-      transition={{ duration: 0.2 }}
-    >
-      <div className="flex items-center space-x-3 mb-4">
-        <div className="p-2 bg-primary-100 rounded-lg">
-          <Wand2 className="h-6 w-6 text-primary-600" />
-        </div>
-        <div>
+    <div className="bg-white rounded-2xl border border-gray-100 p-6 hover:border-lovable-200 hover:shadow-sm transition-all duration-200">
+      <div className="mb-5">
+        <div className="flex items-center space-x-3 mb-2">
+          <div className="p-2 bg-lovable-100 rounded-lg">
+            <Wand2 className="h-5 w-5 text-lovable-600" />
+          </div>
           <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
-          <p className="text-sm text-gray-500">{description}</p>
         </div>
+        <p className="text-sm text-gray-500 ml-12">{description}</p>
       </div>
 
       <textarea
         value={prompt}
         onChange={(e) => setPrompt(e.target.value)}
-        placeholder="Enter your prompt here..."
-        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
-        rows={4}
+        placeholder="Describe what you want to create..."
+        className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-lovable-500 focus:border-transparent resize-none text-sm placeholder:text-gray-400 transition-all"
+        rows={3}
       />
 
-      <motion.button
+      <button
         onClick={handleGenerate}
         disabled={loading || !prompt.trim()}
-        className="mt-4 w-full bg-gradient-to-r from-primary-600 to-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:from-primary-700 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center space-x-2"
-        whileHover={{ scale: loading ? 1 : 1.02 }}
-        whileTap={{ scale: loading ? 1 : 0.98 }}
+        className="mt-4 w-full bg-lovable-600 text-white px-6 py-3 rounded-xl font-medium hover:bg-lovable-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center space-x-2"
       >
         {loading ? (
           <>
-            <Loader2 className="h-5 w-5 animate-spin" />
+            <Loader2 className="h-4 w-4 animate-spin" />
             <span>Generating...</span>
           </>
         ) : (
           <>
-            <Wand2 className="h-5 w-5" />
-            <span>Generate with {provider}</span>
+            <Wand2 className="h-4 w-4" />
+            <span>Generate</span>
           </>
         )}
-      </motion.button>
-    </motion.div>
+      </button>
+    </div>
   )
 }
