@@ -23,8 +23,8 @@ export class AIService {
       this.geminiClient = new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
     }
     
-    if (process.env.HF_API_KEY) {
-      this.hfClient = new HfInference(process.env.HF_API_KEY)
+    if (process.env.HUGGINGFACE_API_KEY) {
+      this.hfClient = new HfInference(process.env.HUGGINGFACE_API_KEY)
     }
   }
 
@@ -61,7 +61,7 @@ export class AIService {
     return completion.choices[0]?.message?.content || ''
   }
 
-  private async generateWithGemini(prompt: string, model = 'gemini-pro'): Promise<string> {
+  private async generateWithGemini(prompt: string, model = 'gemini-1.5-flash'): Promise<string> {
     if (!this.geminiClient) throw new Error('Gemini client not initialized')
     
     const genModel = this.geminiClient.getGenerativeModel({ model })
