@@ -32,9 +32,15 @@ export default function Marketing() {
             body: JSON.stringify({ prompt })
           })
           const j = await res.json()
-          if (j?.success || j?.url || j?.text || j?.content) {
+          // Accept responses with content OR helpful messages
+          if (j?.success || j?.url || j?.text || j?.content || j?.message) {
             output = j
-            break
+            // Only break if we have actual content, continue trying if just a message
+            if (j?.success || j?.url || j?.text || j?.content) {
+              break
+            } else if (!output || !output.message) {
+              output = j // Store message but keep trying
+            }
           }
         } catch (e) {
           continue
@@ -142,13 +148,48 @@ export default function Marketing() {
               <div className="mt-6 bg-gray-50 p-6 rounded-xl border border-gray-200 min-h-[200px]">
                 {result ? (
                   <div className="space-y-3">
-                    {result.url && (
+                    {result.url && mode === 'image' && (
                       <img src={result.url} alt="generated" className="w-full rounded-lg" />
                     )}
+                    {result.url && mode === 'voice' && (
+                      <div className="space-y-3">
+                        <p className="text-sm text-gray-600 font-medium">Generated Voice:</p>
+                        <audio controls className="w-full">
+                          <source src={result.url} type="audio/mpeg" />
+                          Your browser does not support the audio element.
+                        </audio>
+                      </div>
+                    )}
+                    {result.url && mode === 'video' && (
+                      <div className="space-y-3">
+                        <p className="text-sm text-gray-600 font-medium">Generated Video:</p>
+                        <video controls className="w-full rounded-lg">
+                          <source src={result.url} type="video/mp4" />
+                          Your browser does not support the video element.
+                        </video>
+                      </div>
+                    )}
                     {(result.text || result.content) && (
-                      <pre className="text-gray-700 whitespace-pre-wrap text-sm leading-relaxed">
-                        {result.text || result.content}
-                      </pre>
+                      <div className="space-y-2">
+                        <p className="text-sm text-gray-600 font-medium">Generated Text:</p>
+                        <div className="bg-white p-4 rounded-lg border border-gray-200">
+                          <pre className="text-gray-700 whitespace-pre-wrap text-sm leading-relaxed">
+                            {result.text || result.content}
+                          </pre>
+                        </div>
+                      </div>
+                    )}
+                    {result.message && !result.url && !result.text && !result.content && (
+                      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                        <p className="text-sm text-yellow-800">{result.message}</p>
+                      </div>
+                    )}
+                    {result.provider && (
+                      <div className="mt-3 pt-3 border-t border-gray-200">
+                        <span className="inline-flex items-center px-3 py-1 bg-lovable-100 text-lovable-700 text-xs font-medium rounded-full">
+                          Provider: {result.provider}
+                        </span>
+                      </div>
                     )}
                   </div>
                 ) : (
