@@ -1,121 +1,92 @@
 import { useState } from 'react'
 import Layout from '@/components/Layout'
-import AIGeneratorCard from '@/components/AIGeneratorCard'
-import { Sparkles, Zap, Cpu } from 'lucide-react'
+import { Sparkles, ArrowRight, Code, Palette, Megaphone, Workflow as WorkflowIcon } from 'lucide-react'
+import Link from 'next/link'
 
 export default function Home() {
-  const [results, setResults] = useState<{ provider: string; content: string }[]>([])
-
-  const handleGenerate = async (prompt: string, provider: string) => {
-    try {
-      const response = await fetch('/api/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt, provider }),
-      })
-
-      const data = await response.json()
-      
-      if (data.success) {
-        setResults(prev => [{ provider, content: data.content }, ...prev])
-      } else {
-        alert(`Error: ${data.error}`)
-      }
-    } catch (error) {
-      console.error('Generation failed:', error)
-      alert('Failed to generate content. Please check your API keys.')
-    }
-  }
+  const [prompt, setPrompt] = useState('')
 
   return (
     <Layout>
-      <div className="space-y-12">
-        <div className="max-w-3xl">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            Build something with AI
+      <div className="min-h-[90vh] flex flex-col items-center justify-center px-6 py-20">
+        <div className="text-center max-w-5xl mx-auto space-y-8">
+          <div className="inline-block px-4 py-2 bg-white/5 border border-white/10 rounded-full text-sm text-gray-300 backdrop-blur-sm mb-6">
+            Introducing DevIgnite AI x Enterprise Suite
+          </div>
+
+          <h1 className="text-6xl md:text-7xl font-bold mb-6">
+            <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+              Build something
+            </span>
+            <br />
+            <span className="bg-gradient-to-r from-pink-400 via-purple-400 to-blue-400 bg-clip-text text-transparent">
+              Lovable
+            </span>
           </h1>
-          <p className="text-lg text-gray-600">
-            Enterprise AI development platform with multi-provider support and intelligent fallback
+
+          <p className="text-xl text-gray-400 max-w-2xl mx-auto mb-12">
+            Create apps and websites by chatting with AI
           </p>
-        </div>
 
-        <div>
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold text-gray-900">AI Studio</h2>
-            <div className="flex items-center space-x-2 text-sm text-gray-500">
-              <div className="flex items-center space-x-1">
-                <div className="h-1.5 w-1.5 bg-green-500 rounded-full" />
-                <span>3 providers active</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            <AIGeneratorCard
-              title="Groq"
-              description="Lightning-fast LLM inference"
-              provider="groq"
-              onGenerate={handleGenerate}
-            />
-            
-            <AIGeneratorCard
-              title="Google Gemini"
-              description="Multimodal AI from Google"
-              provider="gemini"
-              onGenerate={handleGenerate}
-            />
-            
-            <AIGeneratorCard
-              title="HuggingFace"
-              description="100,000+ open-source models"
-              provider="huggingface"
-              onGenerate={handleGenerate}
-            />
-          </div>
-        </div>
-
-        <div className="bg-gradient-to-br from-lovable-500 to-lovable-600 rounded-2xl p-8 text-white">
-          <div className="max-w-2xl">
-            <div className="flex items-center space-x-3 mb-4">
-              <Sparkles className="h-6 w-6" />
-              <h3 className="text-2xl font-bold">Multi-Provider Fallback</h3>
-            </div>
-            <p className="text-lovable-100 mb-6">
-              Automatic failover across AI providers ensures 99.9% uptime. If one provider is down, your requests seamlessly switch to available alternatives.
-            </p>
-            <div className="flex items-center space-x-6">
-              <div className="flex items-center space-x-2">
-                <Zap className="h-5 w-5 text-lovable-200" />
-                <span className="text-sm">Zero downtime</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Cpu className="h-5 w-5 text-lovable-200" />
-                <span className="text-sm">Smart routing</span>
-              </div>
+          <div className="max-w-3xl mx-auto bg-black/40 backdrop-blur-md rounded-2xl border border-white/10 p-2 shadow-2xl shadow-pink-500/20">
+            <div className="flex items-center gap-3">
+              <input
+                type="text"
+                placeholder="Ask DevIgnite to create a web app"
+                className="flex-1 bg-transparent text-white placeholder-gray-500 px-6 py-4 outline-none text-lg"
+                value={prompt}
+                onChange={(e) => setPrompt(e.target.value)}
+              />
+              <button className="bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 text-white px-8 py-4 rounded-xl font-medium hover:shadow-lg hover:shadow-pink-500/50 transition-all flex items-center gap-2 group">
+                <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+              </button>
             </div>
           </div>
         </div>
+      </div>
 
-        {results.length > 0 && (
-          <div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-6">Recent Generations</h2>
-            <div className="space-y-4">
-              {results.map((result, index) => (
-                <div
-                  key={index}
-                  className="bg-white border border-gray-100 rounded-2xl p-6 hover:border-lovable-200 transition-all"
-                >
-                  <div className="flex items-center space-x-2 mb-3">
-                    <span className="px-3 py-1 bg-lovable-100 text-lovable-700 text-xs font-medium rounded-full">
-                      {result.provider}
-                    </span>
-                  </div>
-                  <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">{result.content}</p>
-                </div>
-              ))}
+      <div className="max-w-7xl mx-auto px-6 py-20">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <Link href="/">
+            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8 hover:bg-white/10 transition-all cursor-pointer group">
+              <div className="bg-gradient-to-br from-blue-500 to-purple-500 p-3 rounded-xl w-fit mb-4 shadow-lg shadow-blue-500/30 group-hover:shadow-blue-500/50 transition-all">
+                <Code className="h-6 w-6 text-white" />
+              </div>
+              <h3 className="text-xl font-bold text-white mb-2">AI Studio</h3>
+              <p className="text-gray-400 text-sm">Multi-provider AI with intelligent fallback</p>
             </div>
-          </div>
-        )}
+          </Link>
+
+          <Link href="/marketing">
+            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8 hover:bg-white/10 transition-all cursor-pointer group">
+              <div className="bg-gradient-to-br from-purple-500 to-pink-500 p-3 rounded-xl w-fit mb-4 shadow-lg shadow-purple-500/30 group-hover:shadow-purple-500/50 transition-all">
+                <Megaphone className="h-6 w-6 text-white" />
+              </div>
+              <h3 className="text-xl font-bold text-white mb-2">Marketing Suite</h3>
+              <p className="text-gray-400 text-sm">AI content generation and social scheduling</p>
+            </div>
+          </Link>
+
+          <Link href="/design">
+            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8 hover:bg-white/10 transition-all cursor-pointer group">
+              <div className="bg-gradient-to-br from-pink-500 to-orange-500 p-3 rounded-xl w-fit mb-4 shadow-lg shadow-pink-500/30 group-hover:shadow-pink-500/50 transition-all">
+                <Palette className="h-6 w-6 text-white" />
+              </div>
+              <h3 className="text-xl font-bold text-white mb-2">Design Studio</h3>
+              <p className="text-gray-400 text-sm">Canvas-based visual design tool</p>
+            </div>
+          </Link>
+
+          <Link href="/automation">
+            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8 hover:bg-white/10 transition-all cursor-pointer group">
+              <div className="bg-gradient-to-br from-cyan-500 to-blue-500 p-3 rounded-xl w-fit mb-4 shadow-lg shadow-cyan-500/30 group-hover:shadow-cyan-500/50 transition-all">
+                <WorkflowIcon className="h-6 w-6 text-white" />
+              </div>
+              <h3 className="text-xl font-bold text-white mb-2">Automation</h3>
+              <p className="text-gray-400 text-sm">n8n workflow automation platform</p>
+            </div>
+          </Link>
+        </div>
       </div>
     </Layout>
   )
